@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Emaan Areesha 💖</title>
+
+<style>
+:root{
+  --pink:#ff5fa2;
+  --purple:#7b5cff;
+  --bg:#0f0f1a;
+  --card:#18182b;
+  --text:#ffffff;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:'Segoe UI',system-ui;
+  background:radial-gradient(circle at top,#1b1b3a,var(--bg));
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+header{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:24px;
+}
+
+.card{
+  background:linear-gradient(180deg,#1f1f3d,var(--card));
+  border-radius:24px;
+  padding:32px 24px;
+  max-width:720px;
+  width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+h1{
+  font-size:clamp(32px,6vw,56px);
+  margin:0 0 12px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+h2{margin-bottom:10px;}
+
+.actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+button{
+  border:none;
+  padding:12px 18px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  color:#fff;
+  cursor:pointer;
+  font-size:16px;
+}
+
+button.secondary{background:#2b2b4a;}
+
+.countdown{
+  margin-top:20px;
+  font-size:20px;
+}
+
+/* Gallery */
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+  margin-top:24px;
+}
+
+.gallery img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:16px;
+  box-shadow:0 10px 20px rgba(0,0,0,.4);
+  transition:transform .3s ease;
+}
+
+.gallery img:hover{
+  transform:scale(1.05);
+}
+
+/* Popup */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.popup{
+  background:var(--card);
+  border-radius:20px;
+  padding:24px;
+  max-width:520px;
+  width:90%;
+  text-align:center;
+}
+
+/* Full screen love */
+#fullScreenLove{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:linear-gradient(45deg,#ff5fa2,#7b5cff);
+  z-index:50;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  color:white;
+  font-size:32px;
+  font-weight:bold;
+}
+
+/* Music Button */
+.music{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:30;
+}
+
+/* Confetti */
+canvas#fx{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fx"></canvas>
+
+<header>
+<div class="card">
+
+<h1>Happy Birthday My Love 🎉</h1>
+<h2>Emaan Areesha 💕</h2>
+
+<div class="actions">
+  <button onclick="openMessage()">💌 Read My Message</button>
+  <button class="secondary" onclick="launchConfetti()">✨ Celebrate</button>
+</div>
+
+<div class="countdown" id="countdown"></div>
+
+<div class="gallery">
+  <img src="photo 1.jpg" alt="Memory 1">
+  <img src="photo 2.jpg" alt="Memory 2">
+  <img src="photo 3.jpg" alt="Memory 3">
+  <img src="photo 4.jpg" alt="Memory 4">
+</div>
+
+</div>
+</header>
+
+<div class="overlay" id="overlay">
+<div class="popup">
+<h2>For You 💖</h2>
+<p id="typeMessage"></p>
+
+<div id="proposalBox" style="margin-top:20px; display:none;">
+<h3>Will You Be Mine Forever? 💍</h3>
+<div style="margin-top:15px; position:relative; height:120px;">
+<button onclick="acceptLove()">✅ YES</button>
+<button id="noBtn" onmouseover="moveNo()" style="position:absolute; left:150px;">😜 NO</button>
+</div>
+</div>
+
+<button class="secondary" onclick="closeMessage()">Close</button>
+</div>
+</div>
+
+<div id="fullScreenLove">
+💖 SHE SAID YES 💖 <br><br>
+Forever Starts Now, Emaan ❤️ <br><br>
+<button onclick="closeLove()">Close</button>
+</div>
+
+<!-- Music -->
+<div class="music">
+  <button id="musicBtn" onclick="toggleMusic()">▶️ Play Music</button>
+</div>
+
+<audio id="bgMusic" loop>
+<source src="happybirthdaysong.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+/* Countdown */
+const birthday=new Date('2026-03-16T00:00:00');
+const cd=document.getElementById('countdown');
+
+function updateCountdown(){
+const now=new Date();
+const diff=birthday-now;
+
+if(diff<=0){
+cd.textContent="🎂 It's Her Birthday Today! 🎂";
+launchConfetti();
+return;
+}
+
+const d=Math.floor(diff/(1000*60*60*24));
+const h=Math.floor((diff/(1000*60*60))%24);
+const m=Math.floor((diff/(1000*60))%60);
+const s=Math.floor((diff/1000)%60);
+
+cd.textContent=`Countdown: ${d}d ${h}h ${m}m ${s}s`;
+}
+setInterval(updateCountdown,1000);
+updateCountdown();
+
+/* Popup */
+const overlay=document.getElementById("overlay");
+
+function openMessage(){
+overlay.style.display="flex";
+document.getElementById("typeMessage").innerHTML="";
+document.getElementById("proposalBox").style.display="none";
+i=0;
+typeWriter();
+}
+
+function closeMessage(){
+overlay.style.display="none";
+}
+
+/* Typewriter */
+const message=`Happy Birthday, Emaan Areesha 💖
+
+From the day you came into my life, everything became more beautiful.
+Your smile is my peace.
+Your voice is my favorite sound.
+Your happiness means everything to me.
+
+I promise to stand by you, support you, and love you more every single day.
+You are not just special…
+You are my everything. 💕`;
+
+let i=0;
+const speed=40;
+
+function typeWriter(){
+if(i<message.length){
+document.getElementById("typeMessage").innerHTML+=message.charAt(i);
+i++;
+setTimeout(typeWriter,speed);
+}else{
+document.getElementById("proposalBox").style.display="block";
+}
+}
+
+/* Funny NO */
+function moveNo(){
+const noBtn=document.getElementById("noBtn");
+const container=noBtn.parentElement;
+
+const maxX=container.clientWidth-noBtn.clientWidth;
+const maxY=container.clientHeight-noBtn.clientHeight;
+
+noBtn.style.left=Math.random()*maxX+"px";
+noBtn.style.top=Math.random()*maxY+"px";
+}
+
+/* YES */
+function acceptLove(){
+document.getElementById("fullScreenLove").style.display="flex";
+launchConfetti();
+}
+
+/* Close love screen */
+function closeLove(){
+document.getElementById("fullScreenLove").style.display="none";
+}
+
+/* Music */
+const music=document.getElementById("bgMusic");
+const musicBtn=document.getElementById("musicBtn");
+let playing=false;
+
+function toggleMusic(){
+if(!playing){
+music.play();
+musicBtn.textContent="⏸️ Pause Music";
+}else{
+music.pause();
+musicBtn.textContent="▶️ Play Music";
+}
+playing=!playing;
+}
+
+/* Confetti */
+const canvas=document.getElementById('fx');
+const ctx=canvas.getContext('2d');
+let W,H,pieces=[];
+
+function resize(){
+W=canvas.width=window.innerWidth;
+H=canvas.height=window.innerHeight;
+}
+window.addEventListener('resize',resize);
+resize();
+
+function launchConfetti(){
+pieces=Array.from({length:150},()=>({
+x:Math.random()*W,
+y:Math.random()*H-H,
+r:Math.random()*6+4,
+s:Math.random()*3+2
+}));
+animate();
+}
+
+function animate(){
+ctx.clearRect(0,0,W,H);
+pieces.forEach(p=>{
+p.y+=p.s;
+ctx.fillStyle=`hsl(${Math.random()*360},90%,60%)`;
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fill();
+});
+pieces=pieces.filter(p=>p.y<H+20);
+if(pieces.length) requestAnimationFrame(animate);
+}
+
+</script>
+</body>
+</html>
